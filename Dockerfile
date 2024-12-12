@@ -1,24 +1,22 @@
-# iperf3 in a container
-#
-# Run as Server:
-# docker run  -it --rm --name=iperf3-srv -p 5201:5201 networkstatic/iperf3 -s
-#
-# Run as Client (first get server IP address):
-# docker inspect --format "{{ .NetworkSettings.IPAddress }}" iperf3-srv
-# docker run  -it --rm networkstatic/iperf3 -c <SERVER_IP>
-#
 FROM alpine:3.21.0
 
 # renovate: datasource=repology depName=alpine_3_21/iperf3 versioning=loose
-ENV IPERF3_VERSION="3.16.1-r0"
+ARG IPERF3_VERSION="3.16.1-r0"
+
+LABEL org.opencontainers.image.title="iperf3-alpine"
+LABEL org.opencontainers.image.description="iperf3 network performance measurement tool"
+LABEL org.opencontainers.image.source="https://github.com/YOUR_REPO"
+LABEL org.opencontainers.image.version="${IPERF3_VERSION}"
+LABEL org.opencontainers.image.licenses="MIT"
+LABEL maintainer="YOUR_NAME <your.email@example.com>"
 
 RUN apk --no-cache upgrade && \
-  apk add --no-cache iperf3
+  apk add --no-cache iperf3=${IPERF3_VERSION} && \
+  adduser -D iperf
 
-# Expose the default iperf3 server port
-EXPOSE 5201
+USER iperf
+WORKDIR /home/iperf
 
-# entrypoint allows you to pass your arguments to the container at runtime
-# very similar to a binary you would run. For example, in the following
-# docker run -it <IMAGE> --help' is like running 'iperf3 --help'
+EXPOSE 5201/tcp 5201/udp
+
 ENTRYPOINT ["iperf3"]

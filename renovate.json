@@ -18,7 +18,7 @@
         "# renovate: datasource=repology depName=alpine_[0-9]+/iperf3\n\\s*(?:ENV|ARG) IPERF3_VERSION=(?<currentValue>.*?)\\s"
       ],
       "datasourceTemplate": "repology",
-      "depNameTemplate": "alpine_3_19/iperf3"
+      "depNameTemplate": "alpine_3_21/iperf3"
     }
   ]
 }

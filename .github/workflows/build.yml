@@ -1,0 +1,57 @@
+name: Build Docker Image
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+env:
+  IMAGE_NAME: mm404/iperf3
+
+jobs:
+
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code from repo
+      uses: actions/checkout@v4
+    - name: Get version from Dockerfile
+      run: |
+        # Get version from ARG IPERF3_VERSION="3.17.1-r0"
+        IPERF3_VERSION=$(grep "^ARG IPERF3_VERSION" Dockerfile | sed 's/.*="\(.*\)-r[[:digit:]]*".*/\1/')
+        # Get version from FROM alpine:3.21.0
+        ALPINE_VERSION=$(grep "^FROM alpine" Dockerfile | sed 's/.*:\(.*\)/\1/')
+        echo "IPERF3_VERSION=$IPERF3_VERSION" >> $GITHUB_ENV
+        echo "ALPINE_VERSION=$ALPINE_VERSION" >> $GITHUB_ENV
+    - name: Set up QEMU
+      uses: docker/setup-qemu-action@v3
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v3
+      with:
+        platforms: linux/amd64,linux/arm/v7,linux/arm64
+    - name: Log in to Docker hub
+      run: echo ${{ secrets.DOCKER_HUB_KEY }} | docker login -u mm404 --password-stdin
+    - name: Build and push
+      uses: docker/build-push-action@v6
+      with:
+        platforms: linux/amd64,linux/arm/v7,linux/arm64
+        push: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
+        tags: |
+          ${{ env.IMAGE_NAME }}:latest
+          ${{ env.IMAGE_NAME }}:${{ env.IPERF3_VERSION }}
+          ${{ env.IMAGE_NAME }}:${{ env.IPERF3_VERSION }}-alpine
+          ${{ env.IMAGE_NAME }}:${{ env.IPERF3_VERSION }}-alpine${{ env.ALPINE_VERSION }}
+
+
+    # - name: Build the Docker image
+    #   run: |
+    #     docker build --no-cache -t "$IMAGE_NAME:$TAG" .
+    # - name: Test container
+    #   run: docker run ${{ env.IMAGE_NAME }}:latest --version
+
+    # - name: Push image to Docker
+    #   if: github.event_name == 'push'
+    #   run: docker push -a $IMAGE_NAME

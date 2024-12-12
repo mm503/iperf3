@@ -9,8 +9,9 @@
   "dependencyDashboard": true,
   "dependencyDashboardAutoclose": false,
   "mode": "auto",
-  "regexManagers": [
+  "customManagers": [
     {
+      "customType": "regex",
       "fileMatch": [
         "^Dockerfile$"
       ],

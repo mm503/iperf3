@@ -9,7 +9,7 @@
 #
 FROM alpine:3.21.0
 
-# renovate: datasource=repology depName=alpine_3_21/iper3 versioning=loose
+# renovate: datasource=repology depName=alpine_3_21/iperf3 versioning=loose
 ENV IPERF3_VERSION="3.16.1-r0"
 
 RUN apk --no-cache upgrade && \

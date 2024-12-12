@@ -1,4 +1,14 @@
 {
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": [
+    "config:recommended"
+  ],
+  "prHourlyLimit": 0,
+  "prConcurrentLimit": 0,
+  "branchConcurrentLimit": 0,
+  "dependencyDashboard": true,
+  "dependencyDashboardAutoclose": false,
+  "mode": "auto",
   "regexManagers": [
     {
       "fileMatch": [

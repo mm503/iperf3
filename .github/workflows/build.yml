@@ -44,14 +44,3 @@ jobs:
           ${{ env.IMAGE_NAME }}:${{ env.IPERF3_VERSION }}
           ${{ env.IMAGE_NAME }}:${{ env.IPERF3_VERSION }}-alpine
           ${{ env.IMAGE_NAME }}:${{ env.IPERF3_VERSION }}-alpine${{ env.ALPINE_VERSION }}
-
-
-    # - name: Build the Docker image
-    #   run: |
-    #     docker build --no-cache -t "$IMAGE_NAME:$TAG" .
-    # - name: Test container
-    #   run: docker run ${{ env.IMAGE_NAME }}:latest --version
-
-    # - name: Push image to Docker
-    #   if: github.event_name == 'push'
-    #   run: docker push -a $IMAGE_NAME

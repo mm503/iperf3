@@ -1,7 +1,7 @@
 FROM alpine:3.22.0
 
 # renovate: datasource=repology depName=alpine_3_21/iperf3 versioning=loose
-ARG IPERF3_VERSION="3.17.1-r0"
+ARG IPERF3_VERSION="3.19-r0"
 
 LABEL org.opencontainers.image.title="mm503/iperf3"
 LABEL org.opencontainers.image.description="iperf3 network performance measurement tool"

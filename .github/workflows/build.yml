@@ -22,9 +22,15 @@ jobs:
       run: |
         # Get version from ARG IPERF3_VERSION="3.17.1-r0"
         IPERF3_VERSION=$(grep "^ARG IPERF3_VERSION" Dockerfile | sed 's/.*="\(.*\)-r[[:digit:]]*".*/\1/')
+        # Establish (semver) image version, add a .0 if needed
+        IMAGE_VERSION=$(echo $IPERF3_VERSION | sed 's/-/./g')
+        if [[ ! $IMAGE_VERSION =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+          IMAGE_VERSION="${IMAGE_VERSION}.0"
+        fi
         # Get version from FROM alpine:3.21.0
         ALPINE_VERSION=$(grep "^FROM alpine" Dockerfile | sed 's/.*:\(.*\)/\1/')
         echo "IPERF3_VERSION=$IPERF3_VERSION" >> $GITHUB_ENV
+        echo "IMAGE_VERSION=$IMAGE_VERSION" >> $GITHUB_ENV
         echo "ALPINE_VERSION=$ALPINE_VERSION" >> $GITHUB_ENV
     - name: Set up QEMU
       uses: docker/setup-qemu-action@v3
@@ -41,6 +47,8 @@ jobs:
         push: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
         tags: |
           ${{ env.IMAGE_NAME }}:latest
-          ${{ env.IMAGE_NAME }}:${{ env.IPERF3_VERSION }}
-          ${{ env.IMAGE_NAME }}:${{ env.IPERF3_VERSION }}-alpine
-          ${{ env.IMAGE_NAME }}:${{ env.IPERF3_VERSION }}-alpine${{ env.ALPINE_VERSION }}
+          ${{ env.IMAGE_NAME }}:${{ env.IMAGE_VERSION }}
+          ${{ env.IMAGE_NAME }}:${{ env.IMAGE_VERSION }}-alpine
+          ${{ env.IMAGE_NAME }}:${{ env.IMAGE_VERSION }}-alpine${{ env.ALPINE_VERSION }}
+        build-args: |
+          IMAGE_VERSION=${{ env.IMAGE_VERSION }}

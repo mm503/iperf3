@@ -41,7 +41,7 @@ jobs:
     - name: Log in to Docker hub
       run: echo ${{ secrets.DOCKER_HUB_KEY }} | docker login -u mm404 --password-stdin
     - name: Build and push
-      uses: docker/build-push-action@v6
+      uses: docker/build-push-action@v7
       with:
         platforms: linux/amd64,linux/arm/v7,linux/arm64
         push: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}

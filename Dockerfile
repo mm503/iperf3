@@ -1,7 +1,7 @@
 FROM alpine:3.23.3
 
-# renovate: datasource=repology depName=alpine_3_22/iperf3 versioning=loose
-ARG IPERF3_VERSION="3.19.1-r1"
+# renovate: datasource=repology depName=alpine_edge/iperf3 versioning=loose
+ARG IPERF3_VERSION="3.20-r0"
 ARG IMAGE_VERSION="0"
 
 LABEL org.opencontainers.image.title="mm503/iperf3"
@@ -13,7 +13,7 @@ LABEL org.opencontainers.image.licenses="MIT"
 LABEL maintainer="MM503 <jostles-felts-0f@icloud.com>"
 
 RUN apk --no-cache upgrade && \
-  apk add --no-cache iperf3=${IPERF3_VERSION} && \
+  apk add --no-cache -X https://dl-cdn.alpinelinux.org/alpine/edge/main iperf3=${IPERF3_VERSION} && \
   adduser -D iperf
 
 USER iperf

@@ -1,7 +1,7 @@
 FROM alpine:3.24.0
 
 # renovate: datasource=repology depName=alpine_edge/iperf3 versioning=loose
-ARG IPERF3_VERSION="3.20-r0"
+ARG IPERF3_VERSION="3.21-r0"
 ARG IMAGE_VERSION="0"
 
 LABEL org.opencontainers.image.title="mm503/iperf3"

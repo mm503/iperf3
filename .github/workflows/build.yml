@@ -17,7 +17,7 @@ jobs:
 
     steps:
     - name: Checkout code from repo
-      uses: actions/checkout@v6
+      uses: actions/checkout@v7
     - name: Get version from Dockerfile
       run: |
         # Get version from ARG IPERF3_VERSION="3.17.1-r0"

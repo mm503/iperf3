@@ -1,4 +1,4 @@
-FROM alpine:3.24.0
+FROM alpine:3.24.1
 
 # renovate: datasource=repology depName=alpine_edge/iperf3 versioning=loose
 ARG IPERF3_VERSION="3.21-r0"

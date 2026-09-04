@@ -1,6 +1,6 @@
 FROM alpine:3.24.1
 
-# renovate: datasource=repology depName=alpine_edge/iperf3 versioning=loose
+# Managed by .github/workflows/update-iperf3.yml (reads alpine edge/main APKINDEX directly)
 ARG IPERF3_VERSION="3.21-r0"
 ARG IMAGE_VERSION="0"
 

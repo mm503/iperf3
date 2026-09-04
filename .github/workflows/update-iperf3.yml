@@ -1,0 +1,100 @@
+name: Update iperf3 version
+
+on:
+  schedule:
+    - cron: '0 5 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+env:
+  ALPINE_BRANCH: edge
+  ALPINE_REPO: main
+  # Must cover every platform built by build.yml
+  ARCHES: x86_64 aarch64 armv7
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Resolve latest iperf3 version in Alpine
+        id: check
+        run: |
+          set -euo pipefail
+
+          current=$(sed -n 's/^ARG IPERF3_VERSION="\(.*\)"$/\1/p' Dockerfile)
+          if [ -z "$current" ]; then
+            echo "::error::Could not read ARG IPERF3_VERSION from Dockerfile"
+            exit 1
+          fi
+          echo "Current: $current"
+
+          # Require every built arch to agree, so we never propose a version
+          # that is still mid-sync on one of the mirrors.
+          latest=""
+          for arch in $ARCHES; do
+            v=$(.github/scripts/alpine-pkg-version.sh \
+                  "$ALPINE_BRANCH" "$ALPINE_REPO" "$arch" iperf3)
+            echo "  $arch: $v"
+            if [ -z "$latest" ]; then
+              latest=$v
+            elif [ "$v" != "$latest" ]; then
+              echo "::notice::Arches disagree ($latest vs $v); mirrors are still syncing. Skipping."
+              echo "changed=false" >> "$GITHUB_OUTPUT"
+              exit 0
+            fi
+          done
+
+          echo "Latest:  $latest"
+          echo "current=$current" >> "$GITHUB_OUTPUT"
+          echo "latest=$latest"   >> "$GITHUB_OUTPUT"
+          if [ "$current" = "$latest" ]; then
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "changed=true"  >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Open pull request
+        if: steps.check.outputs.changed == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.PR_TOKEN || secrets.GITHUB_TOKEN }}
+          CURRENT: ${{ steps.check.outputs.current }}
+          LATEST: ${{ steps.check.outputs.latest }}
+        run: |
+          set -euo pipefail
+          branch="alpine-pkg/iperf3-${LATEST}"
+
+          # Idempotent: a PR for this exact version already exists.
+          if git ls-remote --exit-code --heads origin "$branch" >/dev/null 2>&1; then
+            echo "::notice::Branch $branch already exists; nothing to do."
+            exit 0
+          fi
+
+          sed -i "s|^ARG IPERF3_VERSION=\".*\"$|ARG IPERF3_VERSION=\"${LATEST}\"|" Dockerfile
+          if git diff --quiet Dockerfile; then
+            echo "::error::Dockerfile unchanged after substitution"
+            exit 1
+          fi
+
+          git config user.name  "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git switch -c "$branch"
+          git commit -am "Update iperf3 to ${LATEST}"
+          git push origin "$branch"
+
+          body=$(printf '%s\n' \
+            "Bumps \`IPERF3_VERSION\` from \`${CURRENT}\` to \`${LATEST}\`." \
+            "" \
+            "Source: [\`${ALPINE_BRANCH}/${ALPINE_REPO}\` APKINDEX](https://dl-cdn.alpinelinux.org/alpine/${ALPINE_BRANCH}/${ALPINE_REPO}/x86_64/), identical across \`${ARCHES}\`." \
+            "" \
+            "Opened by \`.github/workflows/update-iperf3.yml\`.")
+
+          gh pr create \
+            --base "${{ github.event.repository.default_branch }}" \
+            --head "$branch" \
+            --title "Update iperf3 to ${LATEST}" \
+            --body "$body"

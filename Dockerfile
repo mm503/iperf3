@@ -1,4 +1,4 @@
-FROM alpine:3.24.1
+FROM alpine:3.24.2
 
 # Managed by .github/workflows/update-iperf3.yml (reads alpine edge/main APKINDEX directly)
 ARG IPERF3_VERSION="3.21-r0"

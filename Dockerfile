@@ -1,7 +1,7 @@
 FROM alpine:3.24.2
 
 # Managed by .github/workflows/update-iperf3.yml (reads alpine edge/main APKINDEX directly)
-ARG IPERF3_VERSION="3.21-r0"
+ARG IPERF3_VERSION="3.22-r0"
 ARG IMAGE_VERSION="0"
 
 LABEL org.opencontainers.image.title="mm503/iperf3"

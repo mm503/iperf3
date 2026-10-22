@@ -7,6 +7,5 @@
   "prConcurrentLimit": 0,
   "branchConcurrentLimit": 0,
   "dependencyDashboard": true,
-  "dependencyDashboardAutoclose": false,
-  "mode": "auto"
+  "dependencyDashboardAutoclose": false
 }
